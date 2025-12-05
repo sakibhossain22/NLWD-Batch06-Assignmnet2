@@ -4,6 +4,7 @@ import config from "./config";
 export const pool = new Pool({
     connectionString: `${config.connection_string}`,
 })
+type User = 'car' | 'bike' | 'van' | 'SUV'
 const initDB = async () => {
     await pool.query(`
         CREATE TABLE IF NOT EXISTS users(
