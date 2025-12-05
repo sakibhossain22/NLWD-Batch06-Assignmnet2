@@ -31,7 +31,7 @@ const getAllVehicle = async (req: Request, res: Response) => {
             res.status(200).json({
                 "success": true,
                 "message": "Vehicle retrieved successfully",
-                "data": result?.rows[0]
+                "data": result?.rows
             })
         }
 
@@ -71,7 +71,7 @@ const getSingleVehicleDetails = async (req: Request, res: Response) => {
 const updateVehicle = async (req: Request, res: Response) => {
     const vehicleId = Number(req.params.vehicleId)
     try {
-        const result = await vehicleServices.updateVehicle(req.body,vehicleId as number)
+        const result = await vehicleServices.updateVehicle(req.body, vehicleId as number)
         res.status(200).json({
             "success": true,
             "message": "Vehicle updated successfully",
@@ -89,9 +89,38 @@ const updateVehicle = async (req: Request, res: Response) => {
         )
     }
 }
+const deleteVehicle = async (req: Request, res: Response) => {
+    const vehicleId = Number(req.params.vehicleId)
+    try {
+        const result = await vehicleServices.deleteVehicle(vehicleId as number)
+
+        if (result.rowCount === 0) {
+            res.status(404).json({
+                "success": false,
+                "message": "Vehicle not found"
+            })
+        } else {
+            res.status(200).json({
+                "success": true,
+                "message": "Vehicle deleted successfully"
+            })
+        }
+
+
+    } catch (err: any) {
+        res.status(404).json(
+            {
+                "success": false,
+                "message": "Something Went Wrong",
+                "errors": err?.detail
+            }
+        )
+    }
+}
 export const vehicleControllers = {
     addVehicle,
     getAllVehicle,
     getSingleVehicleDetails,
-    updateVehicle
+    updateVehicle,
+    deleteVehicle
 }

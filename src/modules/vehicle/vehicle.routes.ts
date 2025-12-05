@@ -9,6 +9,7 @@ router.post('/', vehicleControllers.addVehicle)
 router.get('/', vehicleControllers.getAllVehicle)
 router.get('/:vehicleId', vehicleControllers.getSingleVehicleDetails)
 router.put('/:vehicleId', vehicleControllers.updateVehicle)
+router.delete('/:vehicleId', vehicleControllers.deleteVehicle)
 
 
 

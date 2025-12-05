@@ -16,8 +16,6 @@ const getSingleVehicle = async (vehicleId: number) => {
     return result
 }
 
-
-
 const updateVehicle = async (bodyData: any, vehicleId: number) => {
 
     const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = bodyData
@@ -38,10 +36,18 @@ const updateVehicle = async (bodyData: any, vehicleId: number) => {
 
 
 }
+const deleteVehicle = async (vehicleId: number) => {
+    const result = await pool.query(`
+        DELETE FROM vehicles
+        WHERE id= $1`,
+        [vehicleId])
+    return result
+}
 
 export const vehicleServices = {
     addVehicle,
     getAllVehicle,
     getSingleVehicle,
     updateVehicle,
+    deleteVehicle
 }
