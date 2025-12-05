@@ -68,10 +68,30 @@ const getSingleVehicleDetails = async (req: Request, res: Response) => {
         )
     }
 }
+const updateVehicle = async (req: Request, res: Response) => {
+    const vehicleId = Number(req.params.vehicleId)
+    try {
+        const result = await vehicleServices.updateVehicle(req.body,vehicleId as number)
+        res.status(200).json({
+            "success": true,
+            "message": "Vehicle updated successfully",
+            "data": result?.rows[0]
+        })
 
+
+    } catch (err: any) {
+        res.status(404).json(
+            {
+                "success": false,
+                "message": "Something Went Wrong",
+                "errors": err?.detail
+            }
+        )
+    }
+}
 export const vehicleControllers = {
     addVehicle,
     getAllVehicle,
     getSingleVehicleDetails,
-
+    updateVehicle
 }
