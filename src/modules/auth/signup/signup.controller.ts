@@ -2,27 +2,35 @@ import { Request, Response } from "express";
 import { signUpService } from "./signup.service";
 
 const signUpUser = async (req: Request, res: Response) => {
-
     try {
-        const result =await signUpService.createUser(req.body)
-        console.log(result);
-        res.status(200).json({
-            "success": true,
-            "message": "User registered successfully",
-            "data": result.rows[0]
-        })
+        if (req?.body?.password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: "Password Must Be 6 Character Long",
+            });
+        }
+        const result = await signUpService.createUser(req.body);
+
+        if (!result || !result.rows || result.rows.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "User Exists",
+            });
+        }
+
+        const user = result.rows[0];
+
+        return res.status(201).json({
+            success: true,
+            message: "User registered successfully",
+            data: user,
+        });
+
     } catch (err: any) {
-        res.status(404).json({
-            "success": false,
-            "message": "Sign Up User interrupted",
-            "errors": err.message
-        })
+        console.error(err?.detail);
     }
-
-
-}
-
+};
 
 export const signUpController = {
     signUpUser
-}
+};
