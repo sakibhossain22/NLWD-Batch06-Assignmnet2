@@ -7,6 +7,7 @@ const router = Router()
 
 router.post('/', vehicleControllers.addVehicle)
 router.get('/', vehicleControllers.getAllVehicle)
+router.get('/:vehicleId', vehicleControllers.getSingleVehicleDetails)
 
 
 
