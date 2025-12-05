@@ -4,6 +4,7 @@ import initDB, { pool } from './config/db';
 import { signUpRoutes } from './modules/auth/signup/signup.routes';
 import { signInRoutes } from './modules/auth/signin/signin.routes';
 import { vehicleRoutes } from './modules/vehicle/vehicle.routes';
+import { userRoutes } from './modules/user/user.routes';
 
 
 const app = express()
@@ -18,6 +19,8 @@ app.use('/api/v1/auth/signup', signUpRoutes)
 app.use('/api/v1/auth/signin', signInRoutes)
 // Vehicle
 app.use('/api/v1/vehicles', vehicleRoutes)
+// User 
+app.use('/api/v1/users', userRoutes)
 
 
 

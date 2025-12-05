@@ -1,0 +1,29 @@
+import { Request, Response } from "express";
+import { pool } from "../../config/db";
+
+const getAllUser = async () => {
+    const result = await pool.query(`SELECT * FROM users`)
+    return result
+}
+const updateUser = async (bodyData: any, userId: number) => {
+    const { name, email, phone, role } = bodyData
+
+    const result = await pool.query(`
+        UPDATE users 
+        SET
+        name = COALESCE($1, name),
+        email = COALESCE($2, email),
+        phone = COALESCE($3, phone),
+        role = COALESCE($4, role)
+        WHERE id = $5 
+        RETURNING id, name, email, phone, role`,
+        [name ?? null, email ?? null, phone ?? null, role ?? null, userId])
+
+    return result
+}
+
+export const userServices = {
+    getAllUser,
+    updateUser,
+
+}
