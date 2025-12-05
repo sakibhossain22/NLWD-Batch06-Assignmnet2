@@ -18,6 +18,7 @@ app.use('/api/v1/auth/signup', signUpRoutes)
 app.use('/api/v1/auth/signin', signInRoutes)
 // Vehicle
 app.use('/api/v1/vehicles', vehicleRoutes)
+app.get('/api/v1/vehicles', vehicleRoutes)
 
 
 // route Route api

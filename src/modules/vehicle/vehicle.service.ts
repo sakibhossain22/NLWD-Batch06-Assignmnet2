@@ -7,7 +7,12 @@ const addVehicle = async (bodyData: Record<string, any>) => {
 
     return result
 }
+const getAllVehicle = async () => {
+    const result = await pool.query(`SELECT * FROM vehicles`)
+    return result
+}
 
 export const vehicleServices = {
-    addVehicle
+    addVehicle,
+    getAllVehicle,
 }
