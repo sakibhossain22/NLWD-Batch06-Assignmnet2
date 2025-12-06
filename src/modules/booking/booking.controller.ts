@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { bookingServices } from "./booking.service";
+import { error } from "console";
 
 const getAllBooking = async (req: Request, res: Response) => {
     try {
@@ -13,7 +14,7 @@ const getAllBooking = async (req: Request, res: Response) => {
         } else {
             res.status(200).json({
                 "success": true,
-                "message": "Users Booking successfully",
+                "message": "Booking retrieved successfully",
                 "data": result?.rows
             })
         }
@@ -53,6 +54,7 @@ const addBooking = async (req: Request, res: Response) => {
 
     try {
         const result = await bookingServices.addBooking(req.body)
+        
         res.status(201).json({
             "success": true,
             "message": "Booking created successfully",

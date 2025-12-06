@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { pool } from "../../config/db";
 import { vehicleServices } from "../vehicle/vehicle.service";
+import { error } from "console";
 
 const getAllBooking = async () => {
-    const result = await pool.query(`SELECT * FROM users`)
+    const result = await pool.query(`SELECT * FROM bookings`)
     return result
 }
 const updateBooking = async (bodyData: Record<string, any>, userId: number) => {
@@ -33,18 +34,7 @@ const addBooking = async (bodyData: Record<string, any>) => {
     // get vehicle by id
     const res = await vehicleServices.getSingleVehicle(vehicle_id)
     const vehicle = res.rows[0]
-    const returnableData = {
-        customer_id,
-        vehicle_id,
-        rent_start_date,
-        rent_end_date,
-        "totalprice": Days * vehicle.daily_rent_price,
-        "status": "active",
-        "vehicle": {
-            "vehicle_name": vehicle.vehicle_name,
-            "daily_rent_price": vehicle.daily_rent_price
-        }
-    }
+
     // console.log(returnableData);
 
     const result = await pool.query(`
@@ -52,9 +42,13 @@ const addBooking = async (bodyData: Record<string, any>) => {
         bookings(customer_id,vehicle_id,rent_start_date,rent_end_date,total_price,status) 
         VALUES($1,$2,$3,$4,$5,$6) 
         RETURNING *`,
-        [customer_id,vehicle_id,rent_start_date,rent_end_date,Days * vehicle.daily_rent_price, "active"])
-
-    return {result, vehicle}
+        [customer_id, vehicle_id, rent_start_date, rent_end_date, Days * vehicle.daily_rent_price, "active"])
+    // update vehicle booking status
+    const updateVehiStatus = await pool.query(`
+        UPDATE vehicles 
+        SET availability_status = $1 WHERE id = $2
+        `, ['booked', vehicle_id])
+    return { result, vehicle }
 }
 export const bookingServices = {
     getAllBooking,
