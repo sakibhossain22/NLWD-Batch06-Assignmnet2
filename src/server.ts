@@ -5,6 +5,7 @@ import { signUpRoutes } from './modules/auth/signup/signup.routes';
 import { signInRoutes } from './modules/auth/signin/signin.routes';
 import { vehicleRoutes } from './modules/vehicle/vehicle.routes';
 import { userRoutes } from './modules/user/user.routes';
+import { bookingRoutes } from './modules/booking/booking.routes';
 
 
 const app = express()
@@ -21,6 +22,9 @@ app.use('/api/v1/auth/signin', signInRoutes)
 app.use('/api/v1/vehicles', vehicleRoutes)
 // User 
 app.use('/api/v1/users', userRoutes)
+// Booking`
+app.use('/api/v1/bookings', bookingRoutes)
+
 
 
 

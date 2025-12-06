@@ -21,9 +21,16 @@ const updateUser = async (bodyData: any, userId: number) => {
 
     return result
 }
-
+const deleteUser = async (userId: number) => {
+    const result = await pool.query(`
+        DELETE FROM users
+        WHERE id= $1`,
+        [userId])
+    return result
+}
 export const userServices = {
     getAllUser,
     updateUser,
-
+    deleteUser,
+    
 }
