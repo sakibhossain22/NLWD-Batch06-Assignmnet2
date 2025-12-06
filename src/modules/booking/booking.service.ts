@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../../config/db";
 import { vehicleServices } from "../vehicle/vehicle.service";
+import { JwtPayload } from "jsonwebtoken";
 
 
 const getAllBooking = async (user: any) => {
@@ -13,22 +14,38 @@ const getAllBooking = async (user: any) => {
         return result
     }
 }
-const updateBooking = async (bodyData: Record<string, any>, userId: number) => {
-    const { name, email, phone, role } = bodyData
+const updateBooking = async (bodyData: Record<string, any>, bookingId: number, user: JwtPayload) => {
+    const { status: bookingStatus } = bodyData;
+    console.log(bookingId);
 
-    const result = await pool.query(`
-        UPDATE users 
-        SET
-        name = COALESCE($1, name),
-        email = COALESCE($2, email),
-        phone = COALESCE($3, phone),
-        role = COALESCE($4, role)
-        WHERE id = $5 
-        RETURNING id, name, email, phone, role`,
-        [name ?? null, email ?? null, phone ?? null, role ?? null, userId])
+    if (!bookingStatus) {
+        throw new Error("Status is required");
+    }
+    // fetch vehicle to update status
+    const result = await pool.query(
+        `
+        UPDATE bookings
+        SET status = $1
+        WHERE id = $2
+        RETURNING *;
+        `, [bookingStatus, bookingId]
+    );
+    const vehicleId = result?.rows[0]?.vehicle_id
+    // const vehicle = await vehicleServices.getSingleVehicle(vehicleId)
+    // const vehicleRes = vehicle?.rows[0]
 
-    return result
-}
+    const updateVehicleStatus = await pool.query(`
+        UPDATE vehicles
+        SET availability_status = $1
+        WHERE id = $2
+        RETURNING *
+        `, ["available", vehicleId])
+
+    const resultVehicleUpdate = updateVehicleStatus?.rows[0]
+    console.log(resultVehicleUpdate)
+    return { result, resultVehicleUpdate };
+};
+
 const addBooking = async (bodyData: Record<string, any>) => {
     const { customer_id, vehicle_id, rent_start_date, rent_end_date } = bodyData
 
@@ -52,9 +69,9 @@ const addBooking = async (bodyData: Record<string, any>) => {
     // update vehicle booking status
     const updateVehiStatus = await pool.query(`
         UPDATE vehicles 
-        SET availability_status = $1 WHERE id = $2
+        SET availability_status = $1 WHERE id = $2 RETURNING *
         `, ['booked', vehicle_id])
-    return { result, vehicle }
+    return { result, updateVehiStatus }
 }
 export const bookingServices = {
     getAllBooking,

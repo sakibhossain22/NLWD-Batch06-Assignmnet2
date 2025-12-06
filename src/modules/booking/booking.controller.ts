@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { bookingServices } from "./booking.service";
+import { JwtPayload } from "jsonwebtoken";
 
 const getAllBooking = async (req: Request, res: Response) => {
     try {
@@ -29,13 +30,20 @@ const getAllBooking = async (req: Request, res: Response) => {
     }
 }
 const updateBooking = async (req: Request, res: Response) => {
-    const bookingId = Number(req.params.userId)
+    const bookingId = Number(req.params.bookingId)
     try {
-        const result = await bookingServices.updateBooking(req.body, bookingId)
+        const result = await bookingServices.updateBooking(req.body, bookingId, req.user as JwtPayload)
         res.status(200).json({
             "success": true,
-            "message": "Booking updated successfully",
-            "data": result?.rows[0]
+            "message": `${req?.user?.role === "admin" ? "Booking marked as returned. Vehicle is now available" : req?.user?.role === "customer" && "Booking cancelled successfully"}`,
+            "data": req.user?.role === "customer" ? {
+                ...result?.result?.rows[0]
+            } : {
+                ...result?.result?.rows[0],
+                "vehicle": {
+                    "availability_status": result?.resultVehicleUpdate?.availability_status
+                }
+            }
         })
 
 
@@ -44,7 +52,7 @@ const updateBooking = async (req: Request, res: Response) => {
             {
                 "success": false,
                 "message": "Something Went Wrong",
-                "errors": err?.detail
+                "errors": err
             }
         )
     }
