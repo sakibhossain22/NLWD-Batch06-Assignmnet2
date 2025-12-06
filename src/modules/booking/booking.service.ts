@@ -1,11 +1,17 @@
 import { Request, Response } from "express";
 import { pool } from "../../config/db";
 import { vehicleServices } from "../vehicle/vehicle.service";
-import { error } from "console";
 
-const getAllBooking = async () => {
-    const result = await pool.query(`SELECT * FROM bookings`)
-    return result
+
+const getAllBooking = async (user: any) => {
+    console.log(user);
+    if (user?.role === "admin") {
+        const result = await pool.query(`SELECT * FROM bookings`)
+        return result
+    } else if (user?.role === "customer") {
+        const result = await pool.query(`SELECT * FROM bookings WHERE customer_id = $1`, [user.id])
+        return result
+    }
 }
 const updateBooking = async (bodyData: Record<string, any>, userId: number) => {
     const { name, email, phone, role } = bodyData

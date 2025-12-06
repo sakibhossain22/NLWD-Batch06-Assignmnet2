@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { bookingController } from "./booking.controller";
+import auth from "../../middleware/auth";
 
 const router = Router()
-router.post('/',bookingController.addBooking)
-router.get('/', bookingController.getAllBooking)
+router.post('/', auth("admin", "customer"), bookingController.addBooking)
+router.get('/', auth("admin", "customer"), bookingController.getAllBooking)
 router.put('/:bookingId', bookingController.updateBooking)
 
 

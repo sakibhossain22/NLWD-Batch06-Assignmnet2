@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import { bookingServices } from "./booking.service";
-import { error } from "console";
 
 const getAllBooking = async (req: Request, res: Response) => {
     try {
-        const result = await bookingServices.getAllBooking()
+        const result = await bookingServices.getAllBooking(req.user)
         if (result?.rowCount === 0) {
             res.status(200).json({
                 "success": true,
@@ -14,7 +13,7 @@ const getAllBooking = async (req: Request, res: Response) => {
         } else {
             res.status(200).json({
                 "success": true,
-                "message": "Booking retrieved successfully",
+                "message": `${req?.user?.role === "customer" ? "Your Booking retrieved successfully" : "Booking retrieved successfully"}`,
                 "data": result?.rows
             })
         }
@@ -54,7 +53,7 @@ const addBooking = async (req: Request, res: Response) => {
 
     try {
         const result = await bookingServices.addBooking(req.body)
-        
+
         res.status(201).json({
             "success": true,
             "message": "Booking created successfully",
