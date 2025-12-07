@@ -58,7 +58,16 @@ const updateBooking = async (req: Request, res: Response) => {
     }
 }
 const addBooking = async (req: Request, res: Response) => {
+    const { rent_start_date, rent_end_date } = req?.body
+    const startDate = new Date(rent_start_date);
+    const endDate = new Date(rent_end_date);
 
+    if (endDate < startDate) {
+        return res.status(400).json({
+            success: false,
+            message: "Rent end date cannot be earlier than rent start date"
+        });
+    }
     try {
         const result = await bookingServices.addBooking(req.body)
 
@@ -68,8 +77,8 @@ const addBooking = async (req: Request, res: Response) => {
             "data": {
                 ...result.result.rows[0],
                 "vehicle": {
-                    "vehicle_name": result.vehicle.vehicle_name,
-                    "daily_rent_price": result.vehicle.daily_rent_price
+                    "vehicle_name": result?.updateVehiStatus?.rows[0].vehicle_name,
+                    "daily_rent_price": result?.updateVehiStatus?.rows[0].daily_rent_price
                 }
             }
         })
