@@ -6,8 +6,8 @@ import { JwtPayload } from "jsonwebtoken";
 const addBooking = async (bodyData: Record<string, any>) => {
     const { customer_id, vehicle_id, rent_start_date, rent_end_date } = bodyData
 
-    const startDate = new Date("2025-12-06")
-    const endDate = new Date("2025-12-10")
+    const startDate = new Date(rent_start_date)
+    const endDate = new Date(rent_end_date)
     const time = endDate.getTime() - startDate.getTime()
     const Days = Math.ceil(time / (1000 * 60 * 60 * 24))
     // get vehicle by id
@@ -24,7 +24,7 @@ const addBooking = async (bodyData: Record<string, any>) => {
     const updateVehiStatus = await pool.query(`
         UPDATE vehicles 
         SET availability_status = $1 WHERE id = $2 RETURNING *
-        `, ['active', vehicle_id])
+        `, ['booked', vehicle_id])
     return { result, updateVehiStatus }
 }
 const getAllBooking = async (user: any) => {

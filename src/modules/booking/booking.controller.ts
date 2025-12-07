@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { bookingServices } from "./booking.service";
 import { JwtPayload } from "jsonwebtoken";
 import { Status } from "./booking.type";
+import { vehicleServices } from "../vehicle/vehicle.service";
 
 const getAllBooking = async (req: Request, res: Response) => {
     try {
@@ -35,7 +36,7 @@ const updateBooking = async (req: Request, res: Response) => {
     try {
         const bookingId = Number(req.params.bookingId)
         const allowedStatusType: Status[] = ["active", "cancelled", "returned"]
-        if(req?.user?.role === "customer" && req?.body?.status === "returned") {
+        if (req?.user?.role === "customer" && req?.body?.status === "returned") {
             res.status(403).json({
                 "success": false,
                 "message": "Customer are not authorized to set status returned"
@@ -73,19 +74,31 @@ const updateBooking = async (req: Request, res: Response) => {
     }
 }
 const addBooking = async (req: Request, res: Response) => {
-    const { rent_start_date, rent_end_date } = req?.body
-    const startDate = new Date(rent_start_date);
-    const endDate = new Date(rent_end_date);
-
-    if (endDate < startDate) {
-        return res.status(400).json({
-            success: false,
-            message: "Rent end date cannot be earlier than rent start date"
-        });
-    }
     try {
-        const result = await bookingServices.addBooking(req.body)
+        const { rent_start_date, rent_end_date } = req?.body
+        const startDate = new Date(rent_start_date);
+        const endDate = new Date(rent_end_date);
 
+        if (endDate < startDate) {
+            return res.status(400).json({
+                success: false,
+                message: "Rent end date cannot be earlier than rent start date"
+            });
+        }
+        const { vehicle_id } = req?.body
+        const getVehicle = await vehicleServices.getSingleVehicle(vehicle_id)
+        const vehicle = getVehicle?.rows[0]
+        if (vehicle.availability_status === "booked") {
+            res.status(404).json({
+                "success": false,
+                "message": "Selected Vehicle are already booked",
+            })
+        }
+
+        const result = await bookingServices.addBooking(req.body)
+        console.log(result.result.rowCount);
+
+        // status
         res.status(201).json({
             "success": true,
             "message": "Booking created successfully",
