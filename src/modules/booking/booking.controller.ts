@@ -121,7 +121,7 @@ const addBooking = async (req: Request, res: Response) => {
         const { vehicle_id } = req?.body
         const getVehicle = await vehicleServices.getSingleVehicle(vehicle_id)
         const vehicle = getVehicle?.rows[0]
-        console.log(vehicle);
+
         if (vehicle.availability_status === "booked") {
             return res.status(404).json({
                 "success": false,

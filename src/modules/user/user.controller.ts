@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { userServices } from "./user.service";
 import { JwtPayload } from "jsonwebtoken";
+import { pool } from "../../config/db";
 
 const getAllUser = async (req: Request, res: Response) => {
     try {
@@ -65,6 +66,14 @@ const deleteUser = async (req: Request, res: Response) => {
     const userId = Number(req.params.userId)
     const user = req?.user
     try {
+        const userBooking = await pool.query(`SELECT * FROM bookings WHERE customer_id = $1`, [userId])
+
+        if (userBooking?.rows.length) {
+           return res.status(404).json({
+                "success": false,
+                "message": "User not Deleted cause of active Booking"
+            })
+        }
         const result = await userServices.deleteUser(userId as number, user as JwtPayload)
         // console.log(result);
         res.status(200).json({

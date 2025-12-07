@@ -44,11 +44,7 @@ const updateUser = async (user: any, bodyData: any, userId: number) => {
 };
 
 const deleteUser = async (userId: number, user: JwtPayload) => {
-    const userBooking = await pool.query(`SELECT * FROM bookings WHERE customer_id = $1`, [userId])
-    
-    if (userBooking?.rows.length) {
-        return { "message": "User not Deleted cause of active Booking" }
-    }
+   
     const result = await pool.query(`
         DELETE FROM users
         WHERE id= $1`,
