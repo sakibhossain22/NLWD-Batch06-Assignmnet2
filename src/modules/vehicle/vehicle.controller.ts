@@ -56,7 +56,7 @@ const getAllVehicle = async (req: Request, res: Response) => {
             {
                 "success": false,
                 "message": "Something Went Wrong",
-                "errors": err?.detail
+                "errors": err?.detail || err
             }
         )
     }
@@ -109,26 +109,24 @@ const deleteVehicle = async (req: Request, res: Response) => {
     const vehicleId = Number(req.params.vehicleId)
     try {
         const result = await vehicleServices.deleteVehicle(vehicleId as number)
-
-        if (result.rowCount === 0) {
-            res.status(404).json({
-                "success": false,
-                "message": "Vehicle not found"
-            })
-        } else {
+        console.log(result.res);
+        if (result.res.rowCount === 1) {
             res.status(200).json({
                 "success": true,
                 "message": "Vehicle deleted successfully"
             })
         }
-
+        res.status(404).json({
+            "success": false,
+            "message": "Vehicle not found"
+        })
 
     } catch (err: any) {
         res.status(404).json(
             {
                 "success": false,
                 "message": "Something Went Wrong",
-                "errors": err?.detail
+                "errors": "Cannot Delete The Vehicle Cause of Active Booking"
             }
         )
     }

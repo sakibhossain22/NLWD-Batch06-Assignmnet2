@@ -19,7 +19,7 @@ const auth = (...role: string[]) => {
             const decode = jwt.verify(onlyToken as string, config.secret as string,) as JwtPayload
             req.user = decode as JwtPayload
             if (role.length && !role.includes(decode.role)) {
-                return res.status(500).json({
+                return res.status(403).json({
                     "error": "unauthorized"
                 })
             }

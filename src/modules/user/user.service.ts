@@ -6,10 +6,28 @@ const getAllUser = async () => {
     const result = await pool.query(`SELECT * FROM users`)
     return result
 }
-const updateUser = async (bodyData: any, userId: number) => {
-    const { name, email, phone, role } = bodyData
+const updateUser = async (user: any, bodyData: any, userId: number) => {
+    const { name, email, phone, role } = bodyData;
 
-    const result = await pool.query(`
+    // CUSTOMER: can update ONLY own profile, and cannot change role
+    if (user.role === "customer") {
+        const result = await pool.query(
+            `
+            UPDATE users 
+            SET
+            name = COALESCE($1, name),
+            email = COALESCE($2, email),
+            phone = COALESCE($3, phone)
+            WHERE id = $4
+            RETURNING id, name, email, phone, role
+            `,
+            [name ?? null, email ?? null, phone ?? null, userId]
+        );
+
+        return result;
+    }
+    const result = await pool.query(
+        `
         UPDATE users 
         SET
         name = COALESCE($1, name),
@@ -17,14 +35,17 @@ const updateUser = async (bodyData: any, userId: number) => {
         phone = COALESCE($3, phone),
         role = COALESCE($4, role)
         WHERE id = $5 
-        RETURNING id, name, email, phone, role`,
-        [name ?? null, email ?? null, phone ?? null, role ?? null, userId])
+        RETURNING id, name, email, phone, role
+        `,
+        [name ?? null, email ?? null, phone ?? null, role ?? null, userId]
+    );
 
-    return result
-}
+    return result;
+};
+
 const deleteUser = async (userId: number, user: JwtPayload) => {
     const userBooking = await pool.query(`SELECT * FROM bookings WHERE customer_id = $1`, [userId])
-
+    
     if (userBooking?.rows.length) {
         return { "message": "User not Deleted cause of active Booking" }
     }

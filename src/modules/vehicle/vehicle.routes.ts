@@ -7,9 +7,9 @@ import auth from "../../middleware/auth";
 const router = Router()
 
 router.post('/',auth("admin") ,vehicleControllers.addVehicle)
-router.get('/', auth("admin"), vehicleControllers.getAllVehicle)
+router.get('/', vehicleControllers.getAllVehicle)
 router.get('/:vehicleId', vehicleControllers.getSingleVehicleDetails)
-router.put('/:vehicleId', vehicleControllers.updateVehicle)
+router.put('/:vehicleId',auth("admin"), vehicleControllers.updateVehicle)
 router.delete('/:vehicleId',auth("admin"), vehicleControllers.deleteVehicle)
 
 

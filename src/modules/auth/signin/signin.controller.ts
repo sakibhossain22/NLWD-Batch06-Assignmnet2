@@ -3,8 +3,9 @@ import { signInService } from "./signin.service";
 
 const signInUser = async (req: Request, res: Response) => {
     const { email, password } = req.body
+    const emailLower = email?.toLowerCase()
     try {
-        const result = await signInService.signInUser(email, password)
+        const result = await signInService.signInUser(emailLower, password)
         if (result.token) {
             res.status(200).json({
                 "success": true,

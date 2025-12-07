@@ -15,6 +15,7 @@ const port = config.connection_port
 app.use(express.json())
 
 initDB()
+
 // routes --> controller --> service
 app.use('/api/v1/auth/signup', signUpRoutes)
 app.use('/api/v1/auth/signin', signInRoutes)

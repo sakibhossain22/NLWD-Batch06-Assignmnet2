@@ -30,9 +30,20 @@ const getAllUser = async (req: Request, res: Response) => {
     }
 }
 const updateUser = async (req: Request, res: Response) => {
-    const userId = Number(req.params.userId)
     try {
-        const result = await userServices.updateUser(req.body as any , userId  as number)
+        const userId = Number(req.params.userId)
+        const user = req?.user
+        if (user?.id !== userId && user?.role === "customer") {
+            res.status(404).json({
+                "success": false,
+                "message": "You are not authorized to update another user's profile",
+            })
+        }
+
+        const result = await userServices.updateUser(req.user as any, req.body as any, userId as number)
+
+
+
         res.status(200).json({
             "success": true,
             "message": "User updated successfully",
@@ -45,7 +56,7 @@ const updateUser = async (req: Request, res: Response) => {
             {
                 "success": false,
                 "message": "Something Went Wrong",
-                "errors": err?.detail
+                "errors": err
             }
         )
     }
@@ -54,12 +65,12 @@ const deleteUser = async (req: Request, res: Response) => {
     const userId = Number(req.params.userId)
     const user = req?.user
     try {
-        const result = await userServices.deleteUser(userId as number,user as JwtPayload)
+        const result = await userServices.deleteUser(userId as number, user as JwtPayload)
         // console.log(result);
-            res.status(200).json({
-                "success": true,
-                "message": "User deleted successfully"
-            })
+        res.status(200).json({
+            "success": true,
+            "message": "User deleted successfully"
+        })
 
     } catch (err: any) {
         res.status(404).json(

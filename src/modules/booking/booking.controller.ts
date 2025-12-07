@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { bookingServices } from "./booking.service";
 import { JwtPayload } from "jsonwebtoken";
+import { Status } from "./booking.type";
 
 const getAllBooking = async (req: Request, res: Response) => {
     try {
@@ -30,8 +31,22 @@ const getAllBooking = async (req: Request, res: Response) => {
     }
 }
 const updateBooking = async (req: Request, res: Response) => {
-    const bookingId = Number(req.params.bookingId)
+
     try {
+        const bookingId = Number(req.params.bookingId)
+        const allowedStatusType: Status[] = ["active", "cancelled", "returned"]
+        if(req?.user?.role === "customer" && req?.body?.status === "returned") {
+            res.status(403).json({
+                "success": false,
+                "message": "Customer are not authorized to set status returned"
+            })
+        }
+        if (!allowedStatusType.includes(req?.body?.status)) {
+            res.status(400).json({
+                "success": false,
+                "message": "Invalid Status availability status. Allowed status are active, cancelled and returned"
+            })
+        }
         const result = await bookingServices.updateBooking(req.body, bookingId, req.user as JwtPayload)
         res.status(200).json({
             "success": true,
