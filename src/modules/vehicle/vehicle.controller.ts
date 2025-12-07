@@ -1,9 +1,25 @@
 import { Request, Response } from "express";
 import { vehicleServices } from "./vehicle.service";
+import { Vehicleavailability, VehicleType } from "./vehicle.type";
 
 const addVehicle = async (req: Request, res: Response) => {
 
     try {
+        const allowedVehicleType: VehicleType[] = ["van", "car", "bike", "SUV"]
+        const allowedVehicleavailability: Vehicleavailability[] = ["available", "booked"]
+
+        if (!allowedVehicleavailability.includes(req?.body?.availability_status)) {
+            res.status(400).json({
+                "success": false,
+                "message": "Invalid Vehicle availability status. Allowed status are available and booked"
+            })
+        }
+        if (!allowedVehicleType.includes(req?.body?.type)) {
+            res.status(400).json({
+                "success": false,
+                "message": "Invalid Vehicle Type. Allowed Type are van, car bike, SUV"
+            })
+        }
         const result = await vehicleServices.addVehicle(req.body)
         res.status(201).json({
             "success": true,
@@ -14,7 +30,7 @@ const addVehicle = async (req: Request, res: Response) => {
         res.status(404).json({
             "success": false,
             "message": "Something Went Wrong",
-            "error": err?.detail
+            "error": err
         })
     }
 }

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { userServices } from "./user.service";
+import { JwtPayload } from "jsonwebtoken";
 
 const getAllUser = async (req: Request, res: Response) => {
     try {
@@ -51,21 +52,14 @@ const updateUser = async (req: Request, res: Response) => {
 }
 const deleteUser = async (req: Request, res: Response) => {
     const userId = Number(req.params.userId)
+    const user = req?.user
     try {
-        const result = await userServices.deleteUser(userId as number)
-
-        if (result.rowCount === 0) {
-            res.status(404).json({
-                "success": false,
-                "message": "User not found"
-            })
-        } else {
+        const result = await userServices.deleteUser(userId as number,user as JwtPayload)
+        // console.log(result);
             res.status(200).json({
                 "success": true,
                 "message": "User deleted successfully"
             })
-        }
-
 
     } catch (err: any) {
         res.status(404).json(

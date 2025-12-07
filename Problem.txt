@@ -1,0 +1,1 @@
+daily_rent_price	Required, positive
