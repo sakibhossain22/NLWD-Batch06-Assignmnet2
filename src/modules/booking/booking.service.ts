@@ -39,10 +39,7 @@ const getAllBooking = async (user: any) => {
 }
 const updateBooking = async (bodyData: Record<string, any>, bookingId: number, user: JwtPayload) => {
     const { status: bookingStatus } = bodyData;
-    console.log(bookingStatus);
-    if (!bookingStatus) {
-        throw new Error("Status is required");
-    }
+
     // fetch vehicle to update status
     const result = await pool.query(
         `
