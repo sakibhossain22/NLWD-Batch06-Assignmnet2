@@ -10,15 +10,15 @@ A modular backend API for managing vehicle rentals with authentication, vehicle 
 
 ## 📂 Project Structure
 src/
-├── modules/
-│ ├── auth/
-│ ├── users/
-│ ├── vehicles/
-│ └── bookings/
-├── middlewares/
-├── config/
-├── app.ts
-└── server.ts
+├── ⚙️ config/
+├── 🛡️ middlewares/
+├── 📦 modules/
+│   ├── 🔐 auth/
+│   ├── 👤 users/
+│   ├── 🚘 vehicles/
+│   └── 📅 bookings/
+│───💫types/
+└── 🚀 server.ts
 
 ## 🗄 Database Tables
 **Users:** id, name, email, password, phone, role  
